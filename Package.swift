@@ -1,8 +1,24 @@
 // swift-tools-version: 6.2
 
+import Foundation
 import PackageDescription
 
 let useLocalDeps = Context.environment["SWIFTCI_USE_LOCAL_DEPS"] != nil
+let packageDirectory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+let localQuiverPackagesRoot = Context.environment["QUIVER_PACKAGES_PATH"] ?? ".."
+
+func quiverPackage(_ repository: String) -> Package.Dependency {
+    let localURL = URL(fileURLWithPath: localQuiverPackagesRoot, relativeTo: packageDirectory)
+        .appendingPathComponent(repository)
+        .standardizedFileURL
+    let manifestURL = localURL.appendingPathComponent("Package.swift")
+
+    if FileManager.default.fileExists(atPath: manifestURL.path) {
+        return .package(path: localURL.path)
+    }
+
+    return .package(url: "https://github.com/hironichu/\(repository).git", branch: "main")
+}
 
 func nioDependencies() -> [Package.Dependency] {
     if useLocalDeps {
@@ -11,7 +27,7 @@ func nioDependencies() -> [Package.Dependency] {
         ]
     } else {
         return [
-            .package(url: "https://github.com/hironichu/swift-nio.git", branch: "pr-3433"),
+            .package(url: "https://github.com/apple/swift-nio.git", branch: "pr-3433"),
         ]
     }
 }
@@ -30,7 +46,7 @@ let package = Package(
         .library(name: "QuiverHummingbird", targets: ["QuiverHummingbird"]),
     ],
     dependencies: nioDependencies() + [
-        .package(path: "../quiver-http3"),
+        quiverPackage("quiver-http3"),
         .package(url: "https://github.com/vapor/vapor.git", from: "4.121.4"),
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
