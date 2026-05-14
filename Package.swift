@@ -45,57 +45,74 @@ let package = Package(
         .library(name: "QuiverVapor", targets: ["QuiverVapor"]),
         .library(name: "QuiverHummingbird", targets: ["QuiverHummingbird"]),
     ],
+    traits: [
+        .trait(name: "vapor", description: "Provides integration with the Vapor web framework."),
+        .trait(name: "hummingbird", description: "Provides integration with the Hummingbird web framework."),
+    ],
     dependencies: nioDependencies() + [
         quiverPackage("quiver-http3"),
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.121.4"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.121.4", ),
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.12.0"),
     ],
+
     targets: [
         .target(
             name: "QuiverVapor",
             dependencies: [
-                .product(name: "HTTP3", package: "quiver-http3"),
-                .product(name: "Vapor", package: "vapor"),
-                .product(name: "NIOCore", package: "swift-nio"),
-                .product(name: "NIOHTTP1", package: "swift-nio"),
-                .product(name: "Logging", package: "swift-log"),
+                .product(name: "HTTP3", package: "quiver-http3", condition: .when(traits: ["vapor"])),
+                .product(name: "Vapor", package: "vapor", condition: .when(traits: ["vapor"])),
+                .product(name: "NIOCore", package: "swift-nio", condition: .when(traits: ["vapor"])),
+                .product(name: "NIOHTTP1", package: "swift-nio", condition: .when(traits: ["vapor"])),
+                .product(name: "Logging", package: "swift-log", condition: .when(traits: ["vapor"])),
             ],
-            path: "Sources/QuiverVapor"
+            path: "Sources/QuiverVapor",
+            swiftSettings: [
+                .define("VAPOR", .when(traits: ["vapor"])),
+            ]
         ),
         .target(
             name: "QuiverHummingbird",
             dependencies: [
-                .product(name: "HTTP3", package: "quiver-http3"),
-                .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "HTTPTypes", package: "swift-http-types"),
-                .product(name: "NIOCore", package: "swift-nio"),
-                .product(name: "NIOEmbedded", package: "swift-nio"),
-                .product(name: "Logging", package: "swift-log"),
+                .product(name: "HTTP3", package: "quiver-http3", condition: .when(traits: ["hummingbird"])),
+                .product(name: "Hummingbird", package: "hummingbird", condition: .when(traits: ["hummingbird"])),
+                .product(name: "HTTPTypes", package: "swift-http-types", condition: .when(traits: ["hummingbird"])),
+                .product(name: "NIOCore", package: "swift-nio", condition: .when(traits: ["hummingbird"])),
+                .product(name: "NIOEmbedded", package: "swift-nio", condition: .when(traits: ["hummingbird"])),
+                .product(name: "Logging", package: "swift-log", condition: .when(traits: ["hummingbird"])),
             ],
-            path: "Sources/QuiverHummingbird"
+            path: "Sources/QuiverHummingbird",
+            swiftSettings: [
+                .define("HUMMINGBIRD", .when(traits: ["hummingbird"])),
+            ]
         ),
         .testTarget(
             name: "QuiverVaporTests",
             dependencies: [
                 "QuiverVapor",
-                .product(name: "HTTP3", package: "quiver-http3"),
-                .product(name: "Vapor", package: "vapor"),
-                .product(name: "NIOCore", package: "swift-nio"),
+                .product(name: "HTTP3", package: "quiver-http3", condition: .when(traits: ["vapor"])),
+                .product(name: "Vapor", package: "vapor", condition: .when(traits: ["vapor"])),
+                .product(name: "NIOCore", package: "swift-nio", condition: .when(traits: ["vapor"])),
             ],
-            path: "Tests/QuiverVaporTests"
+            path: "Tests/QuiverVaporTests",
+            swiftSettings: [
+                .define("VAPOR_TESTS", .when(traits: ["vapor"])),
+            ]
         ),
         .testTarget(
             name: "QuiverHummingbirdTests",
             dependencies: [
                 "QuiverHummingbird",
-                .product(name: "HTTP3", package: "quiver-http3"),
-                .product(name: "Hummingbird", package: "hummingbird"),
-                .product(name: "HTTPTypes", package: "swift-http-types"),
-                .product(name: "NIOCore", package: "swift-nio"),
+                .product(name: "HTTP3", package: "quiver-http3", condition: .when(traits: ["hummingbird"])),
+                .product(name: "Hummingbird", package: "hummingbird", condition: .when(traits: ["hummingbird"])),
+                .product(name: "HTTPTypes", package: "swift-http-types", condition: .when(traits: ["hummingbird"])),
+                .product(name: "NIOCore", package: "swift-nio", condition: .when(traits: ["hummingbird"])),
             ],
-            path: "Tests/QuiverHummingbirdTests"
+            path: "Tests/QuiverHummingbirdTests",
+            swiftSettings: [
+                .define("HUMMINGBIRD_TESTS", .when(traits: ["hummingbird"])),
+            ]
         ),
     ]
 )

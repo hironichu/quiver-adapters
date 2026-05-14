@@ -1,3 +1,4 @@
+#if VAPOR
 #if canImport(FoundationEssentials)
 import FoundationEssentials
 #else
@@ -199,3 +200,5 @@ extension QuiverVaporAdapter {
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#if HUMMINGBIRD
 #if canImport(FoundationEssentials)
 import FoundationEssentials
 #else
@@ -191,3 +192,5 @@ private struct HTTP3ResponseBodyWriter: ResponseBodyWriter {
         _ = trailingHeaders
     }
 }
+
+#endif  
