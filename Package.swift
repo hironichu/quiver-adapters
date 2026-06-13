@@ -25,11 +25,12 @@ func quiverPackage(_ repository: String) -> Package.Dependency {
 func nioDependencies() -> [Package.Dependency] {
     if useLocalDeps {
         return [
-            .package(path: "../../swift-nio"),
+            .package(url: "https://github.com/apple/swift-nio.git", from: "2.101.0"),
+            // .package(url: "https://github.com/apple/swift-nio-ssl.git", from: "2.37.1"),
         ]
     } else {
         return [
-            .package(url: "https://github.com/apple/swift-nio.git", branch: "pr-3433"),
+            .package(url: "https://github.com/apple/swift-nio.git", from: "2.101.0"),
         ]
     }
 }
